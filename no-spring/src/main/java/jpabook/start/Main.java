@@ -1,11 +1,14 @@
 package jpabook.start;
 
+import com.querydsl.jpa.impl.JPAQuery;
 import jpabook.start.domain.Member;
+import jpabook.start.domain.QMember;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import java.util.List;
 
 public class Main
 {
@@ -37,9 +40,13 @@ public class Main
 
     private static void logic(EntityManager em)
     {
-        Member m = new Member();
-        m.setAge(10l);
-        m.setName("주현태");
-        em.persist(m);
+        JPAQuery<Member> query = new JPAQuery<>(em);
+        QMember qMember = new QMember("m");
+        List<Member> members = query.from(qMember)
+                .where(qMember.name.eq("주현태"))
+                .orderBy(qMember.age.desc())
+                .fetch();
+
+        System.out.println("회원수 : " + members);
     }
 }
